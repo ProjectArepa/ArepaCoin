@@ -1,0 +1,2 @@
+debian/bin/arepacoind usr/bin
+src/arepacoind usr/lib/arepacoin
