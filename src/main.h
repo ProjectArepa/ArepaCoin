@@ -87,6 +87,7 @@ extern CCriticalSection cs_setpwalletRegistered;
 extern std::set<CWallet*> setpwalletRegistered;
 extern unsigned char pchMessageStart[4];
 extern std::map<uint256, CBlock*> mapOrphanBlocks;
+extern bool fHaveGUI;
 
 // Settings
 extern int64_t nTransactionFee;
@@ -130,7 +131,7 @@ std::string GetWarnings(std::string strFor);
 bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock);
 uint256 WantedByOrphan(const CBlock* pblockOrphan);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
-void StakeMiner(CWallet *pwallet);
+void ThreadStakeMiner(CWallet *pwallet);
 void ResendWalletTransactions(bool fForce = false);
 int GetCoinbaseMaturity(int nHeight);
 
