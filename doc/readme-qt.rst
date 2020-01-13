@@ -1,11 +1,11 @@
-arepacoin-qt: Qt5 GUI for arepacoin
+ArepaCoin-qt: Qt5 GUI for ArepaCoin
 ===============================
 
 Build instructions
 ===================
 
-Debian
--------
+Debian Jessie
+--------------
 
 First, make sure that the required packages for Qt5 development of your
 distribution are installed, for Debian and Ubuntu these are:
@@ -15,7 +15,7 @@ distribution are installed, for Debian and Ubuntu these are:
     apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
         build-essential libboost-dev libboost-system-dev \
         libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
-        libssl-dev libdb++-dev
+        libssl-dev libdb++-dev libminiupnpc-dev
 
 then execute the following:
 
@@ -27,6 +27,12 @@ then execute the following:
 Alternatively, install Qt Creator and open the `arepacoin-qt.pro` file.
 
 An executable named `arepacoin-qt` will be built.
+
+
+Debian Stretch
+--------------
+
+Install libssl1.0-dev instead of libssl-dev
 
 
 Windows
@@ -117,9 +123,9 @@ flag to qmake to control this:
 Berkely DB version warning
 ==========================
 
-A warning for people using the *static binary* version of arepacoin on a Linux/UNIX-ish system (tl;dr: **Berkely DB databases are not forward compatible**).
+A warning for people using the *static binary* version of ArepaCoin on a Linux/UNIX-ish system (tl;dr: **Berkely DB databases are not forward compatible**).
 
-The static binary version of arepacoin is linked against libdb 5.0 (see also `this Debian issue`_).
+The static binary version of ArepaCoin is linked against libdb 5.0 (see also `this Debian issue`_).
 
 Now the nasty thing is that databases from 5.X are not compatible with 4.X.
 

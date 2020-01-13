@@ -19,13 +19,9 @@ class RPCConsole;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
-class QLineEdit;
-class QTableView;
-class QAbstractItemModel;
 class QModelIndex;
 class QProgressBar;
 class QStackedWidget;
-class QUrl;
 QT_END_NAMESPACE
 
 /**
@@ -35,6 +31,7 @@ QT_END_NAMESPACE
 class BitcoinGUI : public QMainWindow
 {
     Q_OBJECT
+
 public:
     explicit BitcoinGUI(QWidget *parent = 0);
     ~BitcoinGUI();
@@ -59,7 +56,9 @@ private:
     ClientModel *clientModel;
     WalletModel *walletModel;
 
-    QStackedWidget *centralWidget;
+    QToolBar *toolbar;
+
+    QStackedWidget *centralStackedWidget;
 
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
@@ -95,8 +94,6 @@ private:
     QAction *lockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
-    QAction *telegramAction;
-    QAction *twitterAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -109,7 +106,7 @@ private:
 
     uint64_t nWeight;
 
-     int spinnerFrame; 
+    int spinnerFrame;
 
     /** Create the main UI actions. */
     void createActions();
@@ -124,15 +121,21 @@ public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count, int nTotalBlocks);
+    void setNumBlocks(int count);
     /** Set the encryption status as shown in the UI.
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
     */
     void setEncryptionStatus(int status);
 
-    /** Notify the user of an error in the network or transaction handling code. */
-    void error(const QString &title, const QString &message, bool modal);
+    /** Notify the user of an event from the core network or transaction handling code.
+       @param[in] title     the message box / notification title
+       @param[in] message   the displayed text
+       @param[in] modal     true to use a message box, false to use a notification
+       @param[in] style     style definitions (icon and used buttons - buttons only for message boxes)
+                            @see CClientUIInterface::MessageBoxFlags
+    */
+    void message(const QString &title, const QString &message, bool modal, unsigned int style);
     /** Asks the user whether to pay the transaction fee or to cancel the transaction.
        It is currently not possible to pass a return value to another thread through
        BlockingQueuedConnection, so an indirected pointer is used.
@@ -155,10 +158,6 @@ private slots:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage();
-    /** Switch to Arepacoin Telegram Group */
-    void openTelegram();
-    /** Switch to Arepacoin Twitter */
-    void openTwitter();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
@@ -179,7 +178,7 @@ private slots:
     */
     void incomingTransaction(const QModelIndex & parent, int start, int end);
     /** Encrypt the wallet */
-    void encryptWallet(bool status);
+    void encryptWallet();
     /** Backup the wallet */
     void backupWallet();
     /** Change encrypted wallet passphrase */
@@ -201,4 +200,4 @@ private slots:
     void detectShutdown();
 };
 
-#endif
+#endif // BITCOINGUI_H

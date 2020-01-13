@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=ArepaCoin
+Comment=ArepaCoin P2P Cryptocurrency
+Comment[fr]=ArepaCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=ArepaCoin, eşten eşe kriptografik sanal para birimi
+Exec=/usr/bin/arepacoin-qt
+Terminal=false
+Type=Application
+Icon=/usr/share/pixmaps/bitcoin80.xpm
+MimeType=x-scheme-handler/arepacoin;
+Categories=Office;

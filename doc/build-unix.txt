@@ -16,7 +16,7 @@ To Build
 cd src/
 make -f makefile.unix            # Headless arepacoin
 
-See readme-qt.rst for instructions on building arepacoin QT,
+See readme-qt.rst for instructions on building ArepaCoin QT,
 the graphical arepacoin.
 
 Dependencies
@@ -76,7 +76,7 @@ Dependency Build Instructions: Gentoo
 emerge -av1 --noreplace boost openssl sys-libs/db
 
 Take the following steps to build (no UPnP support):
- cd ${arepacoin_DIR}/src
+ cd ${BLACKCOIN_DIR}/src
  make -f makefile.unix USE_UPNP=
  strip arepacoind
 

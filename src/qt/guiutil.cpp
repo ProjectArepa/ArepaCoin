@@ -1,11 +1,14 @@
+#include <QApplication>
+
 #include "guiutil.h"
+
 #include "bitcoinaddressvalidator.h"
 #include "walletmodel.h"
 #include "bitcoinunits.h"
+
 #include "util.h"
 #include "init.h"
 
-#include <QString>
 #include <QDateTime>
 #include <QDoubleValidator>
 #include <QFont>
@@ -13,7 +16,6 @@
 #include <QUrl>
 #include <QTextDocument> // For Qt::escape
 #include <QAbstractItemView>
-#include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
 #include <QDesktopServices>
@@ -277,7 +279,7 @@ bool ToolTipToRichTextFilter::eventFilter(QObject *obj, QEvent *evt)
 #ifdef WIN32
 boost::filesystem::path static StartupShortcutPath()
 {
-    return GetSpecialFolderPath(CSIDL_STARTUP) / "Arepacoin.lnk";
+    return GetSpecialFolderPath(CSIDL_STARTUP) / "ArepaCoin.lnk";
 }
 
 bool GetStartOnSystemStartup()
@@ -400,7 +402,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         // Write a bitcoin.desktop file to the autostart directory:
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
-        optionFile << "Name=Arepacoin\n";
+        optionFile << "Name=ArepaCoin\n";
         optionFile << "Exec=" << pszExePath << " -min\n";
         optionFile << "Terminal=false\n";
         optionFile << "Hidden=false\n";
@@ -421,7 +423,7 @@ bool SetStartOnSystemStartup(bool fAutoStart) { return false; }
 HelpMessageBox::HelpMessageBox(QWidget *parent) :
     QMessageBox(parent)
 {
-    header = tr("Arepacoin-Qt") + " " + tr("version") + " " +
+    header = tr("ArepaCoin-Qt") + " " + tr("version") + " " +
         QString::fromStdString(FormatFullVersion()) + "\n\n" +
         tr("Usage:") + "\n" +
         "  arepacoin-qt [" + tr("command-line options") + "]                     " + "\n";
@@ -433,7 +435,7 @@ HelpMessageBox::HelpMessageBox(QWidget *parent) :
         "  -min                   " + tr("Start minimized") + "\n" +
         "  -splash                " + tr("Show splash screen on startup (default: 1)") + "\n";
 
-    setWindowTitle(tr("Arepacoin-Qt"));
+    setWindowTitle(tr("ArepaCoin-Qt"));
     setTextFormat(Qt::PlainText);
     // setMinimumWidth is ignored for QMessageBox so put in non-breaking spaces to make it wider.
     setText(header + QString(QChar(0x2003)).repeated(50));
@@ -471,11 +473,9 @@ void SetBlackThemeQSS(QApplication& app)
                       "QPlainTextEdit { background: rgb(255,255,255); color: rgb(28,28,28); }"
                       "QMenuBar       { background: rgb(41,44,48); color: rgb(28,28,28); }"
                       "QMenu          { background: rgb(255,255,255); color: rgb(28,28,28); }"
-                      "QMenuBar::item { background-color: rgb(41,44,48); color: rgb(255,245,157);}"
                       "QMenu::item:selected { background-color: rgb(251,192,45); }"
-                      "QMenuBar::item:selected { background-color: rgb(41,44,48); }"
                       "QLabel         { color: rgb(28,28,28); }"
-                      "QScrollBar     { color: rgb(255,245,157); }"
+                      "QScrollBar     { color: rgb(255,255,255); }"
                       "QCheckBox      { color: rgb(28,28,28); }"
                       "QRadioButton   { color: rgb(28,28,28); }"
                       "QTabBar::tab   { color: rgb(28,28,28); border: 1px solid rgb(78,79,83); border-bottom: none; padding: 5px; }"
@@ -484,13 +484,13 @@ void SetBlackThemeQSS(QApplication& app)
                       "QTabWidget::pane { border: 1px solid rgb(78,79,83); }"
                       "QToolButton    { background: rgb(255,255,255); color: rgb(28,28,28); border: none; border-left-color: rgb(255,245,157); border-left-style: solid; border-left-width: 6px; margin-top: 8px; margin-bottom: 8px; }"
                       "QToolButton:checked { color: rgb(28,28,28); border: none; border-left-color: rgb(255,235,59); border-left-style: solid; border-left-width: 6px; }"
-                      "QProgressBar   { color: rgb(28,28,28); border-color: rgb(255,245,157); border-width: 1px; border-style: solid; }"
+                      "QProgressBar   { color: rgb(28,28,28); border-color: rgb(255,245,157); border-width: 3px; border-style: solid; }"
                       "QProgressBar::chunk { background: rgb(255,245,157); }"
                       "QTreeView::item { background: rgb(255,255,255); color: rgb(28,28,28); }"
                       "QTreeView::item:selected { background-color: rgb(59,124,220); }"
                       "QTableView     { background: rgb(255,253,231); color: rgb(28,28,28); gridline-color: rgb(157,160,165); }"
                       "QHeaderView::section { background: rgb(255,235,59); color: rgb(28,28,28); }"
-                      "QToolBar       { background: rgb(255,255,255); border: rgb(255,245,157); }");
+                      "QToolBar       { background: rgb(255,255,255); border: border: rgb(255,245,157); }");
 }
 
 } // namespace GUIUtil

@@ -7,7 +7,7 @@ cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP
 software written by Thomas Bernard.
 
 
-See readme-qt.rst for instructions on building arepacoin QT, the
+See readme-qt.rst for instructions on building ArepaCoin QT, the
 graphical user interface.
 
 WINDOWS BUILD NOTES
@@ -76,7 +76,7 @@ make -f Makefile.mingw
 mkdir miniupnpc
 cp *.h miniupnpc/
 
-arepacoin
+ArepaCoin
 -------
 DOS prompt:
 cd \arepacoin\src

@@ -1,19 +1,24 @@
 /*
  * W.J. van der Laan 2011-2012
  */
+
+#include <QApplication>
+
 #include "bitcoingui.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
 #include "guiutil.h"
 #include "guiconstants.h"
-
 #include "init.h"
 #include "util.h"
+#include "wallet.h"
 #include "ui_interface.h"
 #include "paymentserver.h"
+#ifdef Q_OS_MAC
+#include "macdockiconhandler.h"
+#endif
 
-#include <QApplication>
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QLocale>
@@ -37,22 +42,23 @@ Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 static BitcoinGUI *guiref;
 static QSplashScreen *splashref;
 
-static void ThreadSafeMessageBox(const std::string& message, const std::string& caption, int style)
+static void ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style)
 {
     // Message from network thread
     if(guiref)
     {
         bool modal = (style & CClientUIInterface::MODAL);
-        // in case of modal message, use blocking connection to wait for user to click OK
-        QMetaObject::invokeMethod(guiref, "error",
+        // In case of modal message, use blocking connection to wait for user to click a button
+        QMetaObject::invokeMethod(guiref, "message",
                                    modal ? GUIUtil::blockingGUIThreadConnection() : Qt::QueuedConnection,
                                    Q_ARG(QString, QString::fromStdString(caption)),
                                    Q_ARG(QString, QString::fromStdString(message)),
-                                   Q_ARG(bool, modal));
+                                   Q_ARG(bool, modal),
+                                   Q_ARG(unsigned int, style));
     }
     else
     {
-        printf("%s: %s\n", caption.c_str(), message.c_str());
+        LogPrintf("%s: %s\n", caption, message);
         fprintf(stderr, "%s: %s\n", caption.c_str(), message.c_str());
     }
 }
@@ -76,9 +82,10 @@ static void InitMessage(const std::string &message)
 {
     if(splashref)
     {
-        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(255,255,255));
+        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(232,186,63));
         QApplication::instance()->processEvents();
     }
+    LogPrintf("init message: %s\n", message);
 }
 
 /*
@@ -94,9 +101,24 @@ static std::string Translate(const char* psz)
 static void handleRunawayException(std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
-    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. Arepacoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
+    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. ArepaCoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
     exit(1);
 }
+
+/* qDebug() message handler --> debug.log */
+#if QT_VERSION < 0x050000
+void DebugMessageHandler(QtMsgType type, const char * msg)
+{
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg);
+}
+#else
+void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
+{
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg.toStdString());
+}
+#endif
 
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char *argv[])
@@ -123,6 +145,12 @@ int main(int argc, char *argv[])
 
     // Install global event filter that makes sure that long tooltips can be word-wrapped
     app.installEventFilter(new GUIUtil::ToolTipToRichTextFilter(TOOLTIP_WRAP_THRESHOLD, &app));
+    // Install qDebug() message handler to route to debug.log
+#if QT_VERSION < 0x050000
+    qInstallMsgHandler(DebugMessageHandler);
+#else
+    qInstallMessageHandler(DebugMessageHandler);
+#endif
 
     // Command-line options take precedence:
     ParseParameters(argc, argv);
@@ -132,7 +160,7 @@ int main(int argc, char *argv[])
     {
         // This message can not be translated, as translation is not initialized yet
         // (which not yet possible because lang=XX can be overridden in bitcoin.conf in the data directory)
-        QMessageBox::critical(0, "Arepacoin",
+        QMessageBox::critical(0, "ArepaCoin",
                               QString("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(mapArgs["-datadir"])));
         return 1;
     }
@@ -140,12 +168,12 @@ int main(int argc, char *argv[])
 
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
-    app.setOrganizationName("Arepacoin");
+    app.setOrganizationName("ArepaCoin");
     //XXX app.setOrganizationDomain("");
-    if(GetBoolArg("-testnet")) // Separate UI settings for testnet
-        app.setApplicationName("Arepacoin-Qt-testnet");
+    if(GetBoolArg("-testnet", false)) // Separate UI settings for testnet
+        app.setApplicationName("ArepaCoin-Qt-testnet");
     else
-        app.setApplicationName("Arepacoin-Qt");
+        app.setApplicationName("ArepaCoin-Qt");
 
     // ... then GUI settings:
     OptionsModel optionsModel;
@@ -192,8 +220,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+#ifdef Q_OS_MAC
+    // on mac, also change the icon now because it would look strange to have a testnet splash (green) and a std app icon (orange)
+    if(GetBoolArg("-testnet", false))
+    {
+        MacDockIconHandler::instance()->setIcon(QIcon(":icons/bitcoin_testnet"));
+    }
+#endif
+
     QSplashScreen splash(QPixmap(":/images/splash"), 0);
-    if (GetBoolArg("-splash", true) && !GetBoolArg("-min"))
+    if (GetBoolArg("-splash", true) && !GetBoolArg("-min", false))
     {
         splash.show();
         splashref = &splash;
@@ -227,6 +263,8 @@ int main(int argc, char *argv[])
                 // Put this in a block, so that the Model objects are cleaned up before
                 // calling Shutdown().
 
+                paymentServer->setOptionsModel(&optionsModel);
+
                 if (splashref)
                     splash.finish(&window);
 
@@ -237,7 +275,7 @@ int main(int argc, char *argv[])
                 window.setWalletModel(&walletModel);
 
                 // If -min option passed, start window minimized.
-                if(GetBoolArg("-min"))
+                if(GetBoolArg("-min", false))
                 {
                     window.showMinimized();
                 }
@@ -265,6 +303,9 @@ int main(int argc, char *argv[])
         }
         else
         {
+            threadGroup.interrupt_all();
+            threadGroup.join_all();
+            Shutdown();
             return 1;
         }
     } catch (std::exception& e) {

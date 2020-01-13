@@ -2,25 +2,24 @@
 #include "ui_rpcconsole.h"
 
 #include "clientmodel.h"
-#include "bitcoinrpc.h"
 #include "guiutil.h"
 
+#include "rpcserver.h"
+#include "rpcclient.h"
+
 #include <QTime>
-#include <QTimer>
 #include <QThread>
-#include <QTextEdit>
 #include <QKeyEvent>
 #include <QUrl>
 #include <QScrollBar>
 
 #include <openssl/crypto.h>
 
+// TODO: add a scrollback limit, as there is currently none
 // TODO: make it possible to filter out categories (esp debug messages when implemented)
 // TODO: receive errors and debug messages through ClientModel
 
-const int CONSOLE_SCROLLBACK = 50;
 const int CONSOLE_HISTORY = 50;
-
 const QSize ICON_SIZE(24, 24);
 
 const int INITIAL_TRAFFIC_GRAPH_MINS = 30;
@@ -38,12 +37,14 @@ const struct {
 
 /* Object for executing console RPC commands in a separate thread.
 */
-class RPCExecutor: public QObject
+class RPCExecutor : public QObject
 {
     Q_OBJECT
+
 public slots:
     void start();
     void request(const QString &command);
+
 signals:
     void reply(int category, const QString &command);
 };
@@ -264,7 +265,9 @@ void RPCConsole::setClientModel(ClientModel *model)
     {
         // Subscribe to information, replies, messages, errors
         connect(model, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
-        connect(model, SIGNAL(numBlocksChanged(int,int)), this, SLOT(setNumBlocks(int,int)));
+
+        setNumBlocks(model->getNumBlocks());
+        connect(model, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
 
         updateTrafficStats(model->getTotalBytesRecv(), model->getTotalBytesSent());
         connect(model, SIGNAL(bytesChanged(quint64,quint64)), this, SLOT(updateTrafficStats(quint64, quint64)));
@@ -277,8 +280,6 @@ void RPCConsole::setClientModel(ClientModel *model)
 
         setNumConnections(model->getNumConnections());
         ui->isTestNet->setChecked(model->isTestNet());
-
-        setNumBlocks(model->getNumBlocks(), model->getNumBlocksOfPeers());
     }
 }
 
@@ -296,6 +297,8 @@ static QString categoryClass(int category)
 void RPCConsole::clear()
 {
     ui->messagesWidget->clear();
+    history.clear();
+    historyPtr = 0;
     ui->lineEdit->clear();
     ui->lineEdit->setFocus();
 
@@ -314,12 +317,12 @@ void RPCConsole::clear()
                 "table { }"
                 "td.time { color: #808080; padding-top: 3px; } "
                 "td.message { font-family: Monospace; font-size: 12px; } "
-                "td.cmd-request { color: #006060; } "
+                "td.cmd-request { color: #00C0C0; } "
                 "td.cmd-error { color: red; } "
-                "b { color: #006060; } "
+                "b { color: #00C0C0; } "
                 );
 
-    message(CMD_REPLY, (tr("Welcome to the Arepacoin RPC console.") + "<br>" +
+    message(CMD_REPLY, (tr("Welcome to the ArepaCoin RPC console.") + "<br>" +
                         tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
                         tr("Type <b>help</b> for an overview of available commands.")), true);
 }
@@ -342,19 +345,21 @@ void RPCConsole::message(int category, const QString &message, bool html)
 
 void RPCConsole::setNumConnections(int count)
 {
-    ui->numberOfConnections->setText(QString::number(count));
+    if (!clientModel)
+        return;
+
+    QString connections = QString::number(count) + " (";
+    connections += tr("In:") + " " + QString::number(clientModel->getNumConnections(CONNECTIONS_IN)) + " / ";
+    connections += tr("Out:") + " " + QString::number(clientModel->getNumConnections(CONNECTIONS_OUT)) + ")";
+
+    ui->numberOfConnections->setText(connections);
 }
 
-void RPCConsole::setNumBlocks(int count, int countOfPeers)
+void RPCConsole::setNumBlocks(int count)
 {
     ui->numberOfBlocks->setText(QString::number(count));
-    ui->totalBlocks->setText(QString::number(countOfPeers));
     if(clientModel)
-    {
-        // If there is no current number available display N/A instead of 0, which can't ever be true
-        ui->totalBlocks->setText(clientModel->getNumBlocksOfPeers() == 0 ? tr("N/A") : QString::number(clientModel->getNumBlocksOfPeers()));
         ui->lastBlockTime->setText(clientModel->getLastBlockDate().toString());
-    }
 }
 
 void RPCConsole::on_lineEdit_returnPressed()

@@ -42,4 +42,3 @@ private:
 };
 
 #endif // TRAFFICGRAPHWIDGET_H
-

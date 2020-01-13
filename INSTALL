@@ -1,9 +1,9 @@
-Building arepacoin
+Building ArepaCoin
 
-See doc/readme-qt.rst for instructions on building arepacoin QT,
+See doc/readme-qt.rst for instructions on building ArepaCoin QT,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of arepacoin.
+implementation of ArepaCoin.
 
 See doc/build-*.txt for instructions on building arepacoind,
 the intended-for-services, no-graphical-interface, reference
-implementation of arepacoin.
+implementation of ArepaCoin.

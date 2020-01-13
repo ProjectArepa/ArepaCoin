@@ -45,9 +45,9 @@ QString BitcoinUnits::description(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("Arepacoins");
-    case mBTC: return QString("Milli-Arepacoins (1 / 1,000)");
-    case uBTC: return QString("Micro-Arepacoins (1 / 1,000,000)");
+    case BTC: return QString("ArepaCoins");
+    case mBTC: return QString("Milli-ArepaCoins (1 / 1,000)");
+    case uBTC: return QString("Micro-ArepaCoins (1 / 1,000,000)");
     default: return QString("???");
     }
 }

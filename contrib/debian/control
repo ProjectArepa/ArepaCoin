@@ -19,9 +19,9 @@ Build-Depends: debhelper,
  libqt4-dev,
  libqrencode-dev
 Standards-Version: 3.9.2
-Homepage: http://www.arepacoin.su/
-Vcs-Git: git://github.com/CryptoManiac/arepacoin.git
-Vcs-Browser: http://github.com/CryptoManiac/arepacoin
+Homepage: http://www.arepacoin.co/
+Vcs-Git: git://github.com/CoinBlack/arepacoin.git
+Vcs-Browser: http://github.com/CoinBlack/arepacoin
 
 Package: arepacoind
 Architecture: any
@@ -56,4 +56,4 @@ Description: peer-to-peer network based digital currency - Qt GUI
  Full transaction history is stored locally at each client.  This
  requires 2+ GB of space, slowly growing.
  .
- This package provides Novacoin-Qt, a GUI for Novacoin based on Qt.
+ This package provides Blackcoin-Qt, a GUI for Blackcoin based on Qt.

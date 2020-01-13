@@ -12,7 +12,7 @@ Laszlo Hanyecz <solar@heliacal.net>
 Douglas Huff <dhuff@jrbobdobbs.org>
 
 
-See readme-qt.rst for instructions on building arepacoin QT, the
+See readme-qt.rst for instructions on building ArepaCoin QT, the
 graphical user interface.
 
 Tested on 10.5 and 10.6 intel.  PPC is not supported because it's big-endian.
@@ -27,7 +27,7 @@ but you can get the current version from http://developer.apple.com
 
 1.  Clone the github tree to get the source code:
 
-git clone git@github.com:rat4/arepacoin.git arepacoin
+git clone https://github.com/CoinBlack/arepacoin.git arepacoin
 
 2.  Download and install MacPorts from http://www.macports.org/
 
